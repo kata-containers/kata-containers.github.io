@@ -146,7 +146,7 @@ export default function Home() {
                   ? "✅"
                   : run.result === "Fail"
                   ? "❌"
-                  : "⚠️";
+                  : "⏹️";
               return (
                 <span key={`${job.name}-runs-${run.run_num}`}>
                   <a href={run.url}>
