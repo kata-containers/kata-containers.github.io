@@ -90,3 +90,13 @@ mappings:
         slackurl: "https://katacontainers.slack.com/team/U012NV99LPL"
         slack: "Wainer dos Santos Moschetta"
         github: "wainersm"
+
+# Fabiano is the one maintaining the TDX related jobs
+  - regex: ".*tdx.*"
+    group: "Intel"
+    owners:
+      - fullname: "Fabiano Fidêncio"
+        email: "fabiano@fidencio.org"
+        slackurl: "https://katacontainers.slack.com/team/UU8N67ZN1"
+        slack: "Fabiano Fidêncio"
+        github: "fidencio"
