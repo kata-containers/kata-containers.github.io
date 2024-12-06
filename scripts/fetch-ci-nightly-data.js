@@ -20,7 +20,7 @@
 
 // Set token used for making Authorized GitHub API calls.
 // In dev, set by .env file; in prod, set by GitHub Secret.
-if(process.env.NODE_ENV === "development"){
+if(process.env.NODE_ENV !== "production"){
   require('dotenv').config();
 }
 const TOKEN = process.env.TOKEN;  

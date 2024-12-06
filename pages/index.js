@@ -9,31 +9,39 @@ import MaintainerMapping from "../maintainers.yml";
 
 export default function Home() {
   const [loading, setLoading] = useState(true);
+  const [checks, setChecks] = useState([]);
   const [jobs, setJobs] = useState([]);
-  const [rows, setRows] = useState([]);
+  const [rowsPR,        setRowsPR]        = useState([]);
+  const [rowsNightly,   setRowsNightly]   = useState([]);
   const [expandedRows, setExpandedRows] = useState([]);
   const [requiredFilter, setRequiredFilter] = useState(false);
+  const [display,       setDisplay]       = useState("nightly");
 
   useEffect(() => {
     const fetchData = async () => {
-      let data = {};
+      let nightlyData = {};
+      let prData = {};
 
       if (process.env.NODE_ENV === "development") {
-        data = (await import("../localData/job_stats.json")).default;
+        nightlyData = (await import("../localData/job_stats.json")).default;
+        prData = (await import("../localData/check_stats.json")).default;
       } else {
-        const response = await fetch(
+        nightlyData = await fetch(
           "https://raw.githubusercontent.com/kata-containers/kata-containers.github.io" +
             "/refs/heads/latest-dashboard-data/data/job_stats.json"
-        );
-        data = await response.json();
+        ).then((res) => res.json());
+        prData = await fetch(
+          "https://raw.githubusercontent.com/kata-containers/kata-containers.github.io" +
+            "/refs/heads/latest-dashboard-data/data/check_stats.json"
+        ).then((res) => res.json());
       }
 
       try {
-        const jobData = Object.keys(data).map((key) => {
-          const job = data[key];
-          return { name: key, ...job };
-        });
-        setJobs(jobData);
+        const mapData = (data) => Object.keys(data).map((key) => 
+          ({ name: key, ...data[key] })
+        );
+        setJobs(mapData(nightlyData));
+        setChecks(mapData(prData));
       } catch (error) {
         // TODO: Add pop-up/toast message for error
         console.error("Error fetching data:", error);
@@ -54,14 +62,12 @@ export default function Home() {
     return filteredJobs;
   };
 
+  // Filter and set the rows for Nightly view.
   useEffect(() => {
     setLoading(true);
-
-    // Filter based on required tag.
     let filteredJobs = filterRequired(jobs);
-
     //Set the rows for the table.
-    setRows(
+    setRowsNightly(
       filteredJobs.map((job) => ({
         name          : job.name,
         runs          : job.runs,
@@ -73,6 +79,31 @@ export default function Home() {
     );
     setLoading(false);
   }, [jobs, requiredFilter]);
+
+  // Filter and set the rows for PR Checks view.
+  useEffect(() => {
+    setLoading(true);
+    let filteredChecks = filterRequired(checks)
+
+    //Set the rows for the table.
+    setRowsPR(
+      filteredChecks.map((check) => ({
+        name          : check.name,
+        runs          : check.runs,
+        fails         : check.fails,
+        skips         : check.skips,
+        required      : check.required,
+        weather       : getWeatherIndex(check),
+      }))
+    );
+    setLoading(false);
+  }, [checks, requiredFilter]);
+
+  // Close all rows on view switch. 
+  // Needed because if view is switched, breaks expanded row toggling.
+  useEffect(() => {
+    setExpandedRows([])
+  }, [display]); 
 
   const toggleRow = (rowData) => {
     const isRowExpanded = expandedRows.includes(rowData);
@@ -91,6 +122,10 @@ export default function Home() {
     ${active ? "border-blue-500 bg-blue-500 text-white" 
       : "border-gray-300 bg-white hover:bg-gray-100"}`;
 
+  const tabClass = (active) => `tab md:px-4 px-2 py-2 border-b-2 focus:outline-none
+    ${active ? "border-blue-500 bg-gray-300" 
+      : "border-gray-300 bg-white hover:bg-gray-100"}`;
+
 
   // Template for rendering the Name column as a clickable item
   const nameTemplate = (rowData) => {
@@ -104,7 +139,9 @@ export default function Home() {
   const maintainRefs = useRef([]);
 
   const rowExpansionTemplate = (data) => {
-    const job = jobs.find((job) => job.name === data.name);
+    const job = (display === "nightly" 
+      ? jobs
+      : checks).find((job) => job.name === data.name);
   
     // Prepare run data
     const runs = [];
@@ -115,7 +152,7 @@ export default function Home() {
         url: job.urls[i],
       });
     }
-    
+
     // Find maintainers for the given job
     const maintainerData = MaintainerMapping.mappings
       .filter(({ regex }) => new RegExp(regex).test(job.name))
@@ -135,6 +172,7 @@ export default function Home() {
       return acc;
     }, {});
 
+
     return (
       <div key={`${job.name}-runs`} className="p-3 bg-gray-100">
         {/* Display last 10 runs */}
@@ -149,7 +187,7 @@ export default function Home() {
                   : "⚠️";
               return (
                 <span key={`${job.name}-runs-${run.run_num}`}>
-                  <a href={run.url}>
+                  <a href={run.url} target="_blank" rel="noopener noreferrer">
                     {emoji} {run.run_num}
                   </a>
                   &nbsp;&nbsp;&nbsp;&nbsp;
@@ -251,9 +289,10 @@ export default function Home() {
     );
   };
 
-  const renderTable = () => (
+  // Render table for nightly view.
+  const renderNightlyTable = () => (
     <DataTable
-      value={rows}
+      value={rowsNightly}
       expandedRows={expandedRows}
       stripedRows
       rowExpansionTemplate={rowExpansionTemplate}
@@ -263,27 +302,63 @@ export default function Home() {
       sortField="fails"    
       sortOrder={-1}       
     >
-      <Column expander style={{ width: "5rem" }} />
+      <Column expander/>
       <Column
         field="name"
         header="Name"
         body={nameTemplate}
-        filter
+        className="select-text"
         sortable
-        maxConstraints={4}
-        filterHeader="Filter by Name"
-        filterPlaceholder="Search..."
       />
-      <Column field="required" header="Required" sortable />
-      <Column field="runs" header="Runs" sortable />
-      <Column field="fails" header="Fails" sortable />
-      <Column field="skips" header="Skips" sortable />
+      <Column field = "required"      header = "Required" sortable/>
+      <Column 
+        field = "runs"
+        header = "Runs"
+        className="whitespace-nowrap px-2"
+        sortable />
+      <Column field = "fails"         header = "Fails"   sortable/>
+      <Column field = "skips"         header = "Skips"   sortable/>
+      <Column 
+        field = "weather"
+        header = "Weather"
+        body = {weatherTemplate} 
+        sortable />
+    </DataTable>
+  );
+
+  const renderPRTable = () => (
+    <DataTable
+      value={rowsPR}
+      expandedRows={expandedRows}
+      stripedRows
+      rowExpansionTemplate={rowExpansionTemplate}
+      onRowToggle={(e) => setExpandedRows(e.data)}
+      loading={loading}
+      emptyMessage="No results found."
+      sortField="fails"
+      sortOrder={-1}
+    >
+      <Column expander/>
       <Column
-        field="weather"
-        header="Weather"
-        body={weatherTemplate}
+        field="name"
+        header="Name"
+        body={nameTemplate}
+        className="select-text"
         sortable
       />
+      <Column field = "required"      header = "Required" sortable/>
+      <Column 
+        field = "runs"   
+        header = "Runs"
+        className="whitespace-nowrap px-2"
+        sortable />
+      <Column field = "fails"         header = "Fails"   sortable/>
+      <Column field = "skips"         header = "Skips"   sortable/>
+      <Column 
+        field = "weather"  
+        header = "Weather"  
+        body = {weatherTemplate} 
+        sortable />
     </DataTable>
   );
 
@@ -299,30 +374,49 @@ export default function Home() {
         }
       >
         <a
-          href={
-            "https://github.com/kata-containers/kata-containers/" +
-            "actions/workflows/ci-nightly.yaml"
-          }
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Kata CI Dashboard
-        </a>
+            href={display === 'nightly' 
+              ? "https://github.com/kata-containers/kata-containers/" +
+                "actions/workflows/ci-nightly.yaml"
+              : "https://github.com/kata-containers/kata-containers/" +
+                "/pulls?state=closed"}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Kata CI Dashboard
+          </a>
       </h1>
+      <div className="flex flex-wrap mt-2 p-4 md:text-base text-xs">
+        <div className="space-x-2 pb-2 pr-3 mx-auto flex">
+          <button 
+            className={tabClass(display === "nightly")}
+            onClick={() => {
+              setDisplay("nightly");
+            }}>
+            Nightly Jobs
+          </button>
+          <button 
+            className={tabClass(display === "prchecks")}
+            onClick={() => {
+              setDisplay("prchecks");
+            }}>
+            PR Checks
+          </button>
+          </div>
+      </div>
 
-      <main
-        className={
-          "m-0 h-full p-4 overflow-x-hidden overflow-y-auto bg-surface-ground font-normal text-text-color antialiased select-text"
-        }
-      >
+      
+      <div className={"m-0 h-full px-4 overflow-x-hidden overflow-y-auto \
+                        bg-surface-ground antialiased select-text"}>
         <button 
-              className={buttonClass(requiredFilter)} 
-              onClick={() => setRequiredFilter(!requiredFilter)}>
-              Required Jobs Only
+          className={buttonClass(requiredFilter)} 
+          onClick={() => setRequiredFilter(!requiredFilter)}>
+          Required Jobs Only
         </button>
-        <div className="mt-4 text-lg">Total Rows: {rows.length}</div>
-        <div>{renderTable()}</div>
-      </main>
+        <div className="mt-4 text-center md:text-lg text-base">
+          Total Rows: {display === "prchecks" ? rowsPR.length : rowsNightly.length}
+        </div>
+        <div>{display === "prchecks" ? renderPRTable() : renderNightlyTable()}</div>
+      </div>
     </div>
   );
 }
