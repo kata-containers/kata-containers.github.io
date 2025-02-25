@@ -95,6 +95,22 @@ mappings:
   - regex: ".*tdx.*"
     group: "Intel"
     owners:
+      - fullname: "Mikko Ylinen"
+        email: "mikko.ylinen@intel.com"
+        slackurl: "https://katacontainers.slack.com/team/U02HEDZ6QCR"
+        slack: "Mikko Ylinen"
+        github: "mythi"
+
+# Kevin and Fabiano to maintain the k8s ARM64 jobs
+  - regex: ".run-k8s-tests-on-arm64.*"
+    group: "ARM64"
+    owners:
+      - fullname: "Kevin Zhao"
+        email: "kevin.zhao@linaro.org"
+        slackurl: "ihttps://katacontainers.slack.com/team/U0778VADN23"
+        slack: "Kevin Zhao"
+        github: "kevinzs2048"
+
       - fullname: "Fabiano Fidêncio"
         email: "fabiano@fidencio.org"
         slackurl: "https://katacontainers.slack.com/team/UU8N67ZN1"
