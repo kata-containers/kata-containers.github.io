@@ -100,3 +100,19 @@ mappings:
         slackurl: "https://katacontainers.slack.com/team/UU8N67ZN1"
         slack: "Fabiano Fidêncio"
         github: "fidencio"
+
+# Kevin and Fabiano to maintain the k8s ARM64 jobs
+  - regex: ".run-k8s-tests-on-arm64.*"
+    group: "ARM64"
+    owners:
+      - fullname: "Kevin Zhao"
+        email: "kevin.zhao@linaro.org"
+        slackurl: "ihttps://katacontainers.slack.com/team/U0778VADN23"
+        slack: "Kevin Zhao"
+        github: "kevinzs2048"
+
+      - fullname: "Fabiano Fidêncio"
+        email: "fabiano@fidencio.org"
+        slackurl: "https://katacontainers.slack.com/team/UU8N67ZN1"
+        slack: "Fabiano Fidêncio"
+        github: "fidencio"
