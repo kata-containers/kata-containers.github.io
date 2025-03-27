@@ -152,7 +152,7 @@ export default function Dashboard({ coco = false }) {
                   : "⚠️";
               return (
                 <span key={`${job.name}-runs-${run.run_num}`}>
-                  <a href={run.url}>
+                  <a href={run.url} target="_blank" rel="noopener noreferrer">
                     {emoji} {run.run_num}
                   </a>
                   &nbsp;&nbsp;&nbsp;&nbsp;
