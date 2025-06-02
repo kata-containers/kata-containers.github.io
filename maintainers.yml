@@ -116,3 +116,13 @@ mappings:
         slackurl: "https://katacontainers.slack.com/team/UU8N67ZN1"
         slack: "Fabiano Fidêncio"
         github: "fidencio"
+
+  # Sumedh maintains the agent-ctl tests.
+  - regex: ".*run-kata-agent-apis.*"
+    group: "agent-ctl"
+    owners:
+      - fullname: "Sumedh Alok Sharma"
+        email: "sumsharma@microsoft.com"
+        slackurl: "https://katacontainers.slack.com/archives/D08UUBKH42F"
+        slack: "Sumedh Alok Sharma"
+        github: "Sumynwa"
