@@ -37,7 +37,7 @@ const main_branch_url = "https://api.github.com/repos/" +
                         "kata-containers/kata-containers/branches/main";
 
 // The number of jobs to fetch from the github API on each paged request.
-const jobs_per_request = 100;
+const jobs_per_request = 50;
 
 // Count of the number of fetches.
 let fetch_count = 0;
@@ -87,7 +87,7 @@ function get_job_data(run) {
     });
 
     if (!response.ok) {
-      throw new Error(`Failed to fetch jobs: ${response.status}: ` +
+      throw new Error(`Failed to fetch jobs from ${jobs_url}: ${response.status}: ` +
                                             `${response.statusText}`);
     }
     const json = await response.json();
