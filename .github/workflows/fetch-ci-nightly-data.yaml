@@ -18,6 +18,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: npm install
+        shell: bash
+        run: |
+          npm install
       - name: Update dashboard data
         env:
           TOKEN: ${{ secrets.GITHUB_TOKEN }}
