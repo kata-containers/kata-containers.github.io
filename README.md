@@ -76,14 +76,13 @@ Follow these steps to set up the development environment for the Kata Containers
    
    Create the .env file:
    ```bash
-    NODE_ENV=development
     TOKEN=<GITHUB_PAT_OR_OTHER_VALID_TOKEN>
    ```
 
    Create the folder /localData. Then, run:
 
    ```bash
-   node scripts/fetch-ci-nightly-data.js > localData/job_stats.json
+   NODE_ENV=development node scripts/fetch-ci-nightly-data.js > localData/job_stats.json
    npm run dev    # On Windows, run `npm run win-dev` instead.
    ```
    The app will be available at [http://localhost:3000](http://localhost:3000).

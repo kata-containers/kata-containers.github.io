@@ -11,17 +11,12 @@
 //     entry is information about a job and how it has performed over the last
 //     few runs (e.g. pass or fail).
 // 
-// To run locally:
-// node --require dotenv/config scripts/fetch-ci-nightly-data.js 
-//
-// .env file with:
-// NODE_ENV=development
-// TOKEN=token <GITHUB_PAT_OR_OTHER_VALID_TOKEN>
+const dotenv = require("dotenv");
 
 // Set token used for making Authorized GitHub API calls.
 // In dev, set by .env file; in prod, set by GitHub Secret.
 if(process.env.NODE_ENV === "development"){
-  require('dotenv').config();
+  dotenv.config();
 }
 const TOKEN = process.env.TOKEN;  
   
@@ -42,7 +37,7 @@ const main_branch_url = "https://api.github.com/repos/" +
                         "kata-containers/kata-containers/branches/main";
 
 // The number of jobs to fetch from the github API on each paged request.
-const jobs_per_request = 100;
+const jobs_per_request = 50;
 
 // Count of the number of fetches.
 let fetch_count = 0;
@@ -92,7 +87,7 @@ function get_job_data(run) {
     });
 
     if (!response.ok) {
-      throw new Error(`Failed to fetch jobs: ${response.status}: ` +
+      throw new Error(`Failed to fetch jobs from ${jobs_url}: ${response.status}: ` +
                                             `${response.statusText}`);
     }
     const json = await response.json();
