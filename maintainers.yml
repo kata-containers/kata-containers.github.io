@@ -5,7 +5,7 @@
 # @kata-containers/cri-o: ?
 # @kata-containers/dragonball: bergwolf
 # @kata-containers/rust: pmores, lifupan
-# @kata-containers/amd: AdithyaKrishnan, arvindskumar99
+# @kata-containers/amd: AdithyaKrishnan
 
 
 ## slack: member id, display name, or link to profile?
@@ -59,7 +59,7 @@ mappings:
         slack: "fupan li"
         github: "lifupan"
 
-# @kata-containers/amd: AdithyaKrishnan, arvindskumar99
+# @kata-containers/amd: AdithyaKrishnan
   - regex: ".*(qemu-(sev(-snp)?|snp(-experimental)?)|ovmf(-sev)?).*"
     group: "AMD"
     owners:
@@ -68,12 +68,6 @@ mappings:
         slackurl: "https://cloud-native.slack.com/team/U05TX2URB16"
         slack: "Adi"
         github: "AdithyaKrishnan"
-
-      - fullname: "Arvind Kumar"
-        email: "arvind.kumar@amd.com"
-        slackurl: "https://cloud-native.slack.com/team/U06HXU0312P"
-        slack: "Arvind Kumar"
-        github: "arvindskumar99"
 
 # Steve and Wainer to maintain the non-tee CoCo jobs
   - regex: ".*coco-nontee.*"
