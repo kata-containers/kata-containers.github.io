@@ -1,5 +1,7 @@
 # Kata Containers Test Dashboard
 
+## Note: This project is no longer maintained. Please see the <https://github.com/kata-containers/ci-dashboard> repo and <https://kata-containers.github.io/ci-dashboard/> for the current dashboard
+
 This repository contains the **Kata Containers Test Dashboard**, a web application that visualizes data for the nightly tests run by the Kata Containers repository. Built using **Next.js** and styled with **TailwindCSS**, this dashboard provides a simple and efficient interface to monitor test results, leveraging modern frontend technologies to ensure responsive and scalable performance.
 
 ## Features
